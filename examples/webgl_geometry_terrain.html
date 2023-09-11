@@ -41,10 +41,14 @@
 
 			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
+			import { Water } from 'three/addons/objects/Water.js';
+			import { Sky } from 'three/addons/objects/Sky.js';
 
 			let container, stats;
 			let camera, controls, scene, renderer;
 			let mesh, texture;
+
+			let water, sun;
 
 			const worldWidth = 256, worldDepth = 256;
 			const clock = new THREE.Clock();
@@ -59,8 +63,8 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xefd1b5 );
-				scene.fog = new THREE.FogExp2( 0xefd1b5, 0.0025 );
+				// scene.background = new THREE.Color( 0xefd1b5 );
+				scene.fog = new THREE.FogExp2( 0xefd1b5, 0 ); // 0.0025
 
 				const data = generateHeight( worldWidth, worldDepth );
 
@@ -85,6 +89,37 @@
 
 				mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { map: texture } ) );
 				scene.add( mesh );
+
+				sun = new THREE.Vector3();
+
+				// Water
+
+				const waterGeometry = new THREE.PlaneGeometry( 10000, 10000 );
+
+				water = new Water(
+					waterGeometry,
+					{
+						textureWidth: 512,
+						textureHeight: 512,
+						waterNormals: new THREE.TextureLoader().load( 'textures/waternormals.jpg', function ( texture ) {
+
+							texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
+						} ),
+						sunDirection: new THREE.Vector3(),
+						sunColor: 0xffffff,
+						waterColor: 0x001e0f,
+						distortionScale: 3.7,
+						fog: scene.fog !== undefined
+					}
+				);
+
+				water.rotation.x = - Math.PI / 2;
+				water.position.y = 750;
+
+				scene.add( water );
+
+				//
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );

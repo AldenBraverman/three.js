@@ -34,12 +34,15 @@
 
 			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+			import { FirstPersonControls } from 'three/addons/controls/FirstPersonControls.js';
 			import { Water } from 'three/addons/objects/Water.js';
 			import { Sky } from 'three/addons/objects/Sky.js';
 
 			let container, stats;
 			let camera, scene, renderer;
 			let controls, water, sun, mesh;
+
+			const clock = new THREE.Clock();
 
 			init();
 			animate();
@@ -61,7 +64,7 @@
 
 				scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 1, 20000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.set( 30, 30, 100 );
 
 				//
@@ -141,20 +144,24 @@
 
 				//
 
-				const geometry = new THREE.BoxGeometry( 30, 30, 30 );
-				const material = new THREE.MeshStandardMaterial( { roughness: 0 } );
+				// const geometry = new THREE.BoxGeometry( 30, 30, 30 );
+				// const material = new THREE.MeshStandardMaterial( { roughness: 0 } );
 
-				mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
+				// mesh = new THREE.Mesh( geometry, material );
+				// scene.add( mesh );
 
 				//
 
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.maxPolarAngle = Math.PI * 0.495;
-				controls.target.set( 0, 10, 0 );
-				controls.minDistance = 40.0;
-				controls.maxDistance = 200.0;
-				controls.update();
+				// controls = new OrbitControls( camera, renderer.domElement );
+				// controls.maxPolarAngle = Math.PI * 0.495;
+				// controls.target.set( 0, 10, 0 );
+				// controls.minDistance = 40.0;
+				// controls.maxDistance = 200.0;
+				// controls.update();
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+				controls.movementSpeed = 150;
+				controls.lookSpeed = 0.1;
 
 				//
 
@@ -183,12 +190,15 @@
 
 			}
 
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.handleResize();
 
 			}
 
@@ -204,13 +214,15 @@
 
 				const time = performance.now() * 0.001;
 
-				mesh.position.y = Math.sin( time ) * 20 + 5;
-				mesh.rotation.x = time * 0.5;
-				mesh.rotation.z = time * 0.51;
+				// mesh.position.y = Math.sin( time ) * 20 + 5;
+				// mesh.rotation.x = time * 0.5;
+				// mesh.rotation.z = time * 0.51;
 
 				water.material.uniforms[ 'time' ].value += 1.0 / 60.0;
 
 				renderer.render( scene, camera );
+
+				controls.update( clock.getDelta() );
 
 			}
 
